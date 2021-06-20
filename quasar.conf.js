@@ -9,6 +9,7 @@
 /* eslint-env node */
 const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers');
+// const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = configure(function (ctx) {
   return {
@@ -67,9 +68,22 @@ module.exports = configure(function (ctx) {
 
       // https://v2.quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
+
+
+      // node polifill ref: https://github.com/webpack/webpack/pull/8460/commits/a68426e9255edcce7822480b78416837617ab065
       chainWebpack (chain) {
-        chain.plugin('eslint-webpack-plugin')
+        chain
+          .resolve
+            .alias
+              .set('http', require.resolve('stream-http'))
+              .set('https', require.resolve('https-browserify'))
+              .set('timers', require.resolve('timers-browserify'))
+              .set('stream', require.resolve('stream-browserify'))
+        chain
+          .plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js', 'vue' ] }])
+        // chain.plugin('node-polyfill-webpack-plugin')
+        //   .use(NodePolyfillPlugin)
       },
     },
 
